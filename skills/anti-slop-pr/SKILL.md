@@ -1,54 +1,82 @@
 ---
 name: anti-slop-pr
 description: >-
-  Enforce high-signal, zero-slop PR descriptions. Discards AI buzzwords (load-bearing, seam, quietly)
-  and strictly grounds explanations in technical diff facts and the 2-Sentence Rule.
+  Enforce high-signal, zero-slop PR descriptions. Activate this skill whenever the user
+  asks to write, summarize, or format a Pull Request description, git diff, or release summary.
 ---
 
-# Anti-Slop PR Description Generator
+# Anti-Slop PR Description Protocol
 
-This skill teaches the agent how to write concise, senior-engineer grade Pull Request descriptions that respect the reviewer's time and contain zero conversational filler.
-
----
-
-## Core Principles
-
-### 1. The Two-Sentence Rule
-Every PR description summary MUST be understandable in **maximum 2 plain sentences**:
-- **Sentence 1 (What changed):** State the concrete mechanism or code modification.
-- **Sentence 2 (Why it changed):** State the problem solved, bug fixed, or capability enabled.
-
-### 2. Zero AI Slop & Banned Lexicon
-Never use rhetorical metaphors or defensive filler words. See [references/banned-vocabulary.md](./references/banned-vocabulary.md).
-- ❌ **No architectural hyperbole:** Never call a utility function or interface *"load-bearing"*, *"a critical seam"*, or *"tectonic"*.
-- ❌ **No poetic adverbs:** Never say *"quietly resolves"*, *"delves into"*, or *"plainly rejects"*.
-- ❌ **No empty framing:** Never begin with *"In this PR, we aim to..."* or *"Feel free to review"*.
-
-### 3. Strict Diff Grounding
-Describe only what exists in the actual git diff:
-- Name the exact files, exported functions, mutexes, config keys, or DB columns changed.
-- If a change is 5 lines, describe it as a 5-line fix, not a system redesign.
+This skill enforces high-signal, factual Pull Request descriptions. It eliminates conversational AI filler, architectural hyperbole, and poetic metaphors, grounding every explanation directly in the technical diff.
 
 ---
 
-## Standard Output Format
+## The 4-Step Execution Protocol
 
-When generating a PR description, format it strictly using this template:
+When asked to generate or review a PR description, execute these 4 steps in order:
+
+```mermaid
+flowchart LR
+    A[1. Inspect Diff] --> B[2. Identify Mechanism]
+    B --> C[3. Apply 2-Sentence Rule]
+    C --> D[4. Pre-flight Slop Check]
+    D --> E[5. Render Template]
+```
+
+### Step 1: Inspect the Raw Diff
+- Focus strictly on files modified, functions touched, parameters added, or queries altered.
+- Disregard narrative summaries from chat history; ground explanations only in code facts.
+
+### Step 2: Identify the Core Technical Mechanism
+- State the root cause (e.g., race condition, off-by-one index, missing null check, unindexed column).
+- State the programmatic fix (e.g., added mutex lock, added regex validation, created composite DB index).
+
+### Step 3: Apply the Two-Sentence Rule
+Draft the `## Summary` section using **maximum 2 plain sentences**:
+- **Sentence 1 (What):** What was changed technically.
+- **Sentence 2 (Why):** Why it was needed / what problem was solved.
+
+### Step 4: Pre-Flight Slop Self-Check
+Before returning the output, scan your draft against the **Blacklist Table** below. If any term appears, replace it with its plain engineering equivalent:
+
+| Banned AI Term | Empirical Lift | Plain Engineering Replacement |
+| :--- | :--- | :--- |
+| `load-bearing` | **123×** | `critical`, `required`, `core` |
+| `quietly` | **95×** | `defaults to`, `omits without throwing` |
+| `delve` | **88×** | `inspects`, `traverses`, `parses` |
+| `seam` | **84×** | `interface`, `module boundary` |
+| `genuine` | **71×** | `valid`, `verified` |
+| `robust` | **66×** | `error-handled`, `tested` |
+| `latent` | **62×** | `hidden bug`, `unhandled condition` |
+| `survived` | **58×** | `persisted`, `remained` |
+| `seamless` | **59×** | `direct`, `automated` |
+| `orchestrate` | **45×** | `coordinates`, `calls`, `runs` |
+
+---
+
+## Standard Output Template
+
+Format all PR descriptions strictly using this markdown layout:
 
 ```markdown
 ## Summary
-[Sentence 1: What changed technically] [Sentence 2: Why it was needed]
+[Sentence 1: What changed technically]. [Sentence 2: Why it was needed].
 
 ## Changes
-- `<file_path>`: [Technical change detail]
-- `<file_path>`: [Technical change detail]
+- `<file_path>`: [Exact technical modification]
+- `<file_path>`: [Exact technical modification]
 
 ## Verification
-- [Command run / test executed / manual reproduction step checked]
+- [Automated command or manual verification step]
 ```
+
+### Edge-Case Handling:
+- **Breaking Changes:** If the change breaks backwards compatibility, add a `## Breaking Changes` section with exact migration instructions. Do not use dramatic words like *"tectonic shift"*.
+- **Database Migrations:** State the exact table, column names, and index types added/dropped.
+- **Dependency Updates:** State the exact package name and version range diff (e.g. `Upgrade express from 4.18.0 to 4.21.0`).
 
 ---
 
-## Paired Diff Examples
-
-Check [examples/paired-diffs.md](./examples/paired-diffs.md) for direct comparisons between AI Slop and Grounded Senior Engineer output.
+## Extended References
+- Comprehensive Banned Vocabulary: [references/banned-vocabulary.md](./references/banned-vocabulary.md)
+- Paired Diff Translations: [examples/paired-diffs.md](./examples/paired-diffs.md)
